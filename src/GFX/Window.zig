@@ -4,6 +4,8 @@ const glfw = @import("../c.zig").glfw;
 const glad = @import("../c.zig").glad;
 const WindowDesc = @import("./Desc.zig");
 const Pair = @import("../ADT/Pair.zig").Pair;
+const EventLoop = @import("./EventLoop.zig");
+const WindowEvent = @import("./Event.zig").WindowEvent;
 
 pub const WindowError = error{
     GLFWInitFailed,
@@ -74,6 +76,20 @@ pub fn makeCurrent(self: *Self) WindowError!void {
 
 pub fn deinit(self: *Self) void {
     glfw.glfwDestroyWindow(self.window);
+    self.window = null;
+}
+
+pub fn pollEvents(self: *Self, event_loop: *EventLoop) !void {
+    const window = self.window;
+    if (window == null) {
+        return;
+    }
+
+    glfw.glfwPollEvents();
+    if (glfw.glfwWindowShouldClose(window) != 0) {
+        try event_loop.pushEvent(WindowEvent.Close);
+    }
+    try event_loop.pushEvent(WindowEvent.Redraw);
 }
 
 pub inline fn shouldClose(self: *Self) bool {
@@ -83,4 +99,9 @@ pub inline fn shouldClose(self: *Self) bool {
 pub inline fn update(self: *Self) void {
     glfw.glfwSwapBuffers(self.window);
     glfw.glfwPollEvents();
+}
+
+pub inline fn clear(self: *Self) void {
+    _ = self;
+    glad.glClear(glad.GL_COLOR_BUFFER_BIT);
 }

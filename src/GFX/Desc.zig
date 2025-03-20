@@ -7,14 +7,12 @@ const WindowDesc = @This();
 name: ?[]const u8,
 dims: Pair(u32, u32),
 glV: Pair(u4, u4),
-event_loop: *EventLoop,
 
-pub fn init(event_loop: *EventLoop) WindowDesc {
+pub fn init() WindowDesc {
     return WindowDesc{
         .name = null,
         .dims = Pair(u32, u32){ .a = 640, .b = 480 },
         .glV = Pair(u4, u4){ .a = 4, .b = 6 },
-        .event_loop = event_loop,
     };
 }
 
