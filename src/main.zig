@@ -36,7 +36,7 @@ pub fn main() !void {
     while (true) {
         const event = event_loop.next();
         switch (event) {
-            .Skip => {},
+            .Poll => {},
         }
     }
 }

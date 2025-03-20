@@ -23,5 +23,5 @@ pub fn next(self: *Self) WindowEvent {
         return p;
     }
 
-    return WindowEvent.Skip;
+    return WindowEvent.Poll;
 }
