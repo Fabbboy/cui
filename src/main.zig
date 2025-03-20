@@ -1,33 +1,23 @@
-const glfw = @import("c.zig").glfw;
+const std = @import("std");
+
+const Pair = @import("ADT/Pair.zig").Pair;
+const Window = @import("GFX/Window.zig");
+const WindowDesc = Window.WindowDesc;
 const glad = @import("c.zig").glad;
 
 pub fn main() !void {
-    if (glfw.glfwInit() == 0) {
-        return error.Unreachable;
-    }
+    var desc = WindowDesc.init();
+    _ = desc.setName("Hello, World!")
+        .setDims(Pair(u32, u32).init(800, 600))
+        .setGLV(Pair(u4, u4).init(4, 6));
 
-    defer glfw.glfwTerminate();
+    var window = try Window.init(desc);
+    try window.makeCurrent();
+    defer window.deinit();
 
-    glfw.glfwWindowHint(glfw.GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfw.glfwWindowHint(glfw.GLFW_CONTEXT_VERSION_MINOR, 6);
-    glfw.glfwWindowHint(glfw.GLFW_OPENGL_PROFILE, glfw.GLFW_OPENGL_CORE_PROFILE);
-
-    const window = glfw.glfwCreateWindow(640, 480, "Hello World", null, null);
-    if (window == null) {
-        return error.Unreachable;
-    }
-
-    glfw.glfwMakeContextCurrent(window);
-
-    if (glad.gladLoadGLLoader(@as(glad.GLADloadproc, @ptrCast(&glfw.glfwGetProcAddress))) == 0) {
-        return error.Unreachable;
-    }
-
-    glad.glClearColor(0.1, 0.2, 0.3, 1.0);
-
-    while (glfw.glfwWindowShouldClose(window) == 0) {
-        glfw.glfwSwapBuffers(window);
-        glfw.glfwPollEvents();
+    while (window.shouldClose() == false) {
+        window.update();
+        std.debug.print("{}:{}\n", .{window.desc.dims.a, window.desc.dims.b});
         glad.glClear(glad.GL_COLOR_BUFFER_BIT);
     }
 }
