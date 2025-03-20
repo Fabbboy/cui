@@ -41,6 +41,7 @@ pub fn deinit(self: *Self) void {
     self._events.deinit();
     if (self._window) |*w| {
         w.deinit();
+        self._window = null;
     }
 }
 
