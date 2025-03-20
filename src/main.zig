@@ -32,11 +32,4 @@ pub fn main() !void {
     var window = try Window.init(desc);
     try window.makeCurrent();
     defer window.deinit();
-
-    while (true) {
-        const event = event_loop.next();
-        switch (event) {
-            .Poll => {},
-        }
-    }
 }

@@ -16,12 +16,3 @@ pub fn init(allocator: mem.Allocator) Self {
 pub fn deinit(self: *Self) void {
     self.events.deinit();
 }
-
-pub fn next(self: *Self) WindowEvent {
-    const popped = self.events.pop();
-    if (popped) |p| {
-        return p;
-    }
-
-    return WindowEvent.Poll;
-}
