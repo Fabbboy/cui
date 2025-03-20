@@ -1,28 +1,33 @@
-const c = @cImport({
-    @cInclude("glad.h");
-    @cInclude("GLFW/glfw3.h");
-});
+const glfw = @import("c.zig").glfw;
+const glad = @import("c.zig").glad;
 
 pub fn main() !void {
-    if (c.glfwInit() == 0) {
+    if (glfw.glfwInit() == 0) {
         return error.Unreachable;
     }
 
-    defer c.glfwTerminate();
+    defer glfw.glfwTerminate();
 
-    const window = c.glfwCreateWindow(640, 480, "Hello World", null, null);
+    glfw.glfwWindowHint(glfw.GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfw.glfwWindowHint(glfw.GLFW_CONTEXT_VERSION_MINOR, 6);
+    glfw.glfwWindowHint(glfw.GLFW_OPENGL_PROFILE, glfw.GLFW_OPENGL_CORE_PROFILE);
+
+    const window = glfw.glfwCreateWindow(640, 480, "Hello World", null, null);
     if (window == null) {
         return error.Unreachable;
     }
 
-    c.glfwMakeContextCurrent(window);
+    glfw.glfwMakeContextCurrent(window);
 
-    if (c.gladLoadGLLoader(@as(c.GLADloadproc, @ptrCast(&c.glfwGetProcAddress))) == 0) {
+    if (glad.gladLoadGLLoader(@as(glad.GLADloadproc, @ptrCast(&glfw.glfwGetProcAddress))) == 0) {
         return error.Unreachable;
     }
 
-    while (c.glfwWindowShouldClose(window) == 0) {
-        c.glfwSwapBuffers(window);
-        c.glfwPollEvents();
+    glad.glClearColor(0.1, 0.2, 0.3, 1.0);
+
+    while (glfw.glfwWindowShouldClose(window) == 0) {
+        glfw.glfwSwapBuffers(window);
+        glfw.glfwPollEvents();
+        glad.glClear(glad.GL_COLOR_BUFFER_BIT);
     }
 }
