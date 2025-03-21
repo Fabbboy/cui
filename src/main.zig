@@ -2,12 +2,12 @@ const std = @import("std");
 const heap = std.heap;
 
 const Pair = @import("ADT/Pair.zig").Pair;
-const EventLoop = @import("GFX/EventLoop.zig");
-const WindowEvent = @import("GFX/Event.zig").WindowEvent;
-const Window = @import("GFX/Window.zig");
-const WindowDesc = @import("GFX/Desc.zig");
+const EventLoop = @import("Window/EventLoop.zig");
+const WindowEvent = @import("Window/Event.zig").WindowEvent;
+const Window = @import("Window/Window.zig");
+const WindowDesc = @import("Window/Desc.zig");
 const glad = @import("c.zig").glad;
-const EventApp = @import("GFX/App.zig").EventApp;
+const EventApp = @import("Window/App.zig").EventApp;
 
 pub const GameApp = struct {
     window: *Window,
