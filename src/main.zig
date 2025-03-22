@@ -1,5 +1,6 @@
 const std = @import("std");
 const heap = std.heap;
+const mem = std.mem;
 
 const Pair = @import("ADT/Pair.zig").Pair;
 const EventLoop = @import("Window/EventLoop.zig");
@@ -9,13 +10,36 @@ const WindowDesc = @import("Window/Desc.zig");
 const glad = @import("c.zig").glad;
 const EventApp = @import("Window/App.zig").EventApp;
 
+const Source = @import("ADT/Source.zig");
+
+const Shader = @import("Graphics/Shader.zig");
+
 pub const GameApp = struct {
     window: *Window,
+    allocator: mem.Allocator,
+    triangle_shader: ?Shader,
 
-    pub fn init(window: *Window) GameApp {
+    pub fn init(window: *Window, allocator: mem.Allocator) GameApp {
         return GameApp{
             .window = window,
+            .allocator = allocator,
+            .triangle_shader = null,
         };
+    }
+
+    pub fn deinit(self: *GameApp) void {
+        if (self.triangle_shader) |*shader| {
+            shader.deinit();
+        }
+    }
+
+    pub fn prepare(self: *GameApp) !void {
+        var vertex_source = try Source.init(self.allocator, "assets/shaders/triangle.vert");
+        defer vertex_source.deinit();
+        var frag_source = try Source.init(self.allocator, "assets/shaders/triangle.frag");
+        defer frag_source.deinit();
+
+        self.triangle_shader = try Shader.init(&vertex_source, &frag_source, self.allocator);
     }
 
     pub fn handle(self: *GameApp, event: WindowEvent, event_loop: *EventLoop) void {
@@ -62,7 +86,10 @@ pub fn main() !void {
     defer event_loop.deinit();
     const window = try event_loop.window();
 
-    var gameapp = GameApp.init(window);
+    var gameapp = GameApp.init(window, gpa.allocator());
+    defer gameapp.deinit();
+    try gameapp.prepare();
+
     const app = gameapp.app();
     try event_loop.run(GameApp, app);
 

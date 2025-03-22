@@ -1,9 +1,9 @@
 .{
-    .name = .maybe,
+    .name = .zui,
 
     .version = "0.0.0",
 
-    .fingerprint = 0x15291baae500983a,
+    .fingerprint = 0xc00160dbfa98e86b,
 
     .minimum_zig_version = "0.14.0",
 
