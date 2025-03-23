@@ -28,8 +28,7 @@ pub fn init(vertex: *const Source, frag: *const Source, allocator: mem.Allocator
     const vertex_shader = try self.compile_shader(vertex, glad.GL_VERTEX_SHADER);
     const frag_shader = try self.compile_shader(frag, glad.GL_FRAGMENT_SHADER);
 
-    _ = vertex_shader;
-    _ = frag_shader;
+    self.shader_id = try self.link_shader(vertex_shader, frag_shader);
 
     return self;
 }
@@ -42,6 +41,34 @@ pub fn deinit(self: *Self) void {
     if (self.err) |*e| {
         e.deinit();
     }
+}
+
+pub fn bind(self: *Self) void {
+    glad.glUseProgram(@as(c_uint, @intCast(self.shader_id)));
+}
+
+fn link_shader(self: *Self, vertex_shader: u32, frag_shader: u32) ShaderError!u32 {
+    const shader_id = glad.glCreateProgram();
+    glad.glAttachShader(shader_id, vertex_shader);
+    glad.glAttachShader(shader_id, frag_shader);
+    glad.glLinkProgram(shader_id);
+
+    var success: i32 = 0;
+    glad.glGetProgramiv(shader_id, glad.GL_LINK_STATUS, &success);
+    if (success == 0) {
+        var log_length: i32 = 0;
+        glad.glGetProgramiv(shader_id, glad.GL_INFO_LOG_LENGTH, &log_length);
+
+        var log_str = try String.initCapacity(@as(usize, @intCast(log_length)), self.allocator);
+
+        glad.glGetProgramInfoLog(shader_id, log_length, null, @as([*c]u8, @alignCast(@ptrCast(&log_str))));
+
+        self.err = log_str;
+
+        return ShaderError.LinkageFailed;
+    }
+
+    return shader_id;
 }
 
 fn compile_shader(self: *Self, source: *const Source, shader_type: u32) ShaderError!u32 {
