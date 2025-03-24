@@ -11,6 +11,7 @@ const glad = @import("c.zig").glad;
 const EventApp = @import("Window/App.zig").EventApp;
 
 const c = @import("c.zig");
+const glfw = c.glfw;
 const GLType = c.GLType;
 
 const Source = @import("ADT/Source.zig");
@@ -108,7 +109,6 @@ pub const GameApp = struct {
                 self.triangle_shader.?.bind();
                 self.brick_wall.?.bind(0);
                 self.triangle_shader.?.setInt("uTexture", 0);
-                self.triangle_shader.?.setVec2("uResolution", ziglm.Vec2(f32).new(800.0, 600.0));
                 glad.glDrawElements(glad.GL_TRIANGLES, 6, glad.GL_UNSIGNED_INT, null);
 
                 self.window.update();
