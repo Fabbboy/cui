@@ -120,6 +120,7 @@ pub const GameApp = struct {
     pub fn handle(self: *GameApp, event: WindowEvent, event_loop: *EventLoop) void {
         switch (event) {
             WindowEvent.Redraw => {
+                self.input.update();
                 self.window.clear();
 
                 self.vao.?.bind();
@@ -163,9 +164,6 @@ pub const GameApp = struct {
                 if (self.input.isPressed(KeyCode.D)) {
                     self.model = glm.translate(self.model, glm.vec3(0.1, 0.0, 0.0));
                 }
-            },
-            WindowEvent.PreFrame => {
-                self.input.update();
             },
         }
     }

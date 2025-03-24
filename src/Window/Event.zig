@@ -11,5 +11,4 @@ pub const WindowEvent = union(enum) {
     Pressed: KeyCode,
     Released: KeyCode,
     Action: void,
-    PreFrame: void,
 };
