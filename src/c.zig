@@ -15,22 +15,16 @@ pub const GLType = enum(u32) {
     Int = glad.GL_INT,
 
     pub fn toOpengl(self: GLType) c_uint {
-        switch (self) {
-            .Float => return glad.GL_FLOAT,
-            .Int => return glad.GL_INT,
-        }
+        return @as(c_uint, @intFromEnum(self));
     }
 };
 
-pub const ImgFormat = enum(u32) {
+pub const ImgFormat = enum(i32) {
     RGB = stbi.STBI_rgb,
     RGBA = stbi.STBI_rgb_alpha,
 
     pub fn toStbi(self: ImgFormat) c_int {
-        switch (self) {
-            .RGB => return stbi.STBI_rgb,
-            .RGBA => return stbi.STBI_rgb_alpha,
-        }
+        return @as(c_int, @intFromEnum(self));
     }
 
     pub fn toOpengl(self: ImgFormat) c_uint {
@@ -47,10 +41,6 @@ pub const RenderMode = enum(u32) {
     Points = glad.GL_POINTS,
 
     pub fn toOpengl(self: RenderMode) c_uint {
-        switch (self) {
-            .Triangles => return glad.GL_TRIANGLES,
-            .Lines => return glad.GL_LINES,
-            .Points => return glad.GL_POINTS,
-        }
+        return @as(c_uint, @intFromEnum(self));
     }
 };
