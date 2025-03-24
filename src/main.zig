@@ -26,6 +26,8 @@ const Attribute = @import("Graphics/Pipeline.zig").Attribute;
 
 const Texture = @import("Graphics/Texture.zig");
 
+const ziglm = @import("ziglm");
+
 pub const GameApp = struct {
     window: *Window,
     allocator: mem.Allocator,

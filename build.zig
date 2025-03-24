@@ -5,11 +5,18 @@ pub fn build(b: *std.Build) void {
 
     const optimize = b.standardOptimizeOption(.{});
 
+    const ziglm_mod = b.createModule(.{
+        .root_source_file = b.path("ziglm/src/ziglm.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+
     const exe_mod = b.createModule(.{
         .root_source_file = b.path("src/main.zig"),
         .target = target,
         .optimize = optimize,
     });
+    exe_mod.addImport("ziglm", ziglm_mod);
 
     const exe = b.addExecutable(.{
         .name = "zui",
@@ -18,16 +25,11 @@ pub fn build(b: *std.Build) void {
 
     exe.addIncludePath(b.path("vendor"));
 
-    const CSourceGlad = std.Build.Module.CSourceFile{
-        .file = b.path("vendor/glad.c"),
-    };
-
-    const CSourceStbi = std.Build.Module.CSourceFile{
-        .file = b.path("vendor/stb_image.c"),
-    };
-
-    exe.addCSourceFile(CSourceGlad);
-    exe.addCSourceFile(CSourceStbi);
+    exe.addCSourceFiles(.{
+        .root = b.path("vendor"),
+        .files = &.{ "glad.c", "stb_image.c" },
+        .language = .c,
+    });
     exe.linkLibC();
     exe.linkSystemLibrary("glfw3");
 

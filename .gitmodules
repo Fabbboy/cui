@@ -1,0 +1,3 @@
+[submodule "ziglm"]
+	path = ziglm
+	url = https://github.com/karlobratko/ziglm.git
