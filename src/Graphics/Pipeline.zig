@@ -84,7 +84,7 @@ pub const Pipeline = struct {
     fn calcStride(self: *Self) void {
         self.stride = 0;
         for (self.attributes.items) |*attribute| {
-            self.stride += attribute.size * @sizeOf(f32);
+            self.stride += attribute.size * @sizeOf(f32);   
         }
     }
 

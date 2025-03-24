@@ -55,6 +55,15 @@ pub fn init(path: []const u8, format: ImgFormat) TextureError!Self {
     };
 }
 
+pub fn bind(self: *Self, slot: u32) void {
+    const casted = @as(c_uint, @intCast(slot));
+    const base = @as(c_uint, @intCast(glad.GL_TEXTURE0));
+    const added = @as(c_uint, @intCast(base + casted));
+
+    glad.glActiveTexture(added);
+    glad.glBindTexture(glad.GL_TEXTURE_2D, self.tex_id);
+}
+
 pub fn deinit(self: *Self) void {
     glad.glDeleteTextures(1, &self.tex_id);
 }

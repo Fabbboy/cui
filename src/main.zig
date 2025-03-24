@@ -70,13 +70,17 @@ pub const GameApp = struct {
         self.triangle_shader = try Shader.init(&vertex_source, &frag_source, self.allocator);
 
         const vertices = [_]f32{
-            // positions       // tex coords
-            0.0, 0.5, 0.0, 0.5, 1.0, // top
-            -0.5, -0.5, 0.0, 0.0, 0.0, // bottom left
+            // positions        // tex coords
+            -0.5, 0.5, 0.0, 0.0, 1.0, // top left
+            0.5, 0.5, 0.0, 1.0, 1.0, // top right
             0.5, -0.5, 0.0, 1.0, 0.0, // bottom right
+            -0.5, -0.5, 0.0, 0.0, 0.0, // bottom left
         };
 
-        const indices = [_]u32{ 0, 1, 2 };
+        const indices = [_]u32{
+            0, 1, 2, // first triangle (top left → top right → bottom right)
+            2, 3, 0, // second triangle (bottom right → bottom left → top left)
+        };
 
         self.triangle_vbo = try Buffer.create(BufferType.ArrayBuffer, BufferUsage.StaticDraw, f32, &vertices);
         self.triangle_ebo = try Buffer.create(BufferType.ElementArrayBuffer, BufferUsage.StaticDraw, u32, &indices);
@@ -99,36 +103,11 @@ pub const GameApp = struct {
                 self.window.clear();
 
                 self.vao.?.bind();
-                var glError = glad.glGetError();
-                if (glError != glad.GL_NO_ERROR) {
-                    std.debug.print("OpenGL error: {d}\n", .{glError});
-                }
                 self.triangle_shader.?.bind();
-
-                glError = glad.glGetError();
-                if (glError != glad.GL_NO_ERROR) {
-                    std.debug.print("OpenGL error: {d}\n", .{glError});
-                }
-                glad.glActiveTexture(glad.GL_TEXTURE0);
-                glError = glad.glGetError();
-                if (glError != glad.GL_NO_ERROR) {
-                    std.debug.print("OpenGL error: {d}\n", .{glError});
-                }
-                glad.glBindTexture(glad.GL_TEXTURE_2D, self.brick_wall.?.tex_id);
-                glError = glad.glGetError();
-                if (glError != glad.GL_NO_ERROR) {
-                    std.debug.print("OpenGL error: {d}\n", .{glError});
-                }
+                self.brick_wall.?.bind(0);
                 self.triangle_shader.?.setInt("uTexture", 0);
-                glError = glad.glGetError();
-                if (glError != glad.GL_NO_ERROR) {
-                    std.debug.print("OpenGL error: {d}\n", .{glError});
-                }
-                glad.glDrawElements(glad.GL_TRIANGLES, 3, glad.GL_UNSIGNED_INT, null);
-                glError = glad.glGetError();
-                if (glError != glad.GL_NO_ERROR) {
-                    std.debug.print("OpenGL error: {d}\n", .{glError});
-                }
+                glad.glDrawElements(glad.GL_TRIANGLES, 6, glad.GL_UNSIGNED_INT, null);
+
                 self.window.update();
             },
             WindowEvent.Close => {
