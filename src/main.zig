@@ -116,8 +116,8 @@ pub const GameApp = struct {
                 self.triangle_shader.?.bind();
                 self.brick_wall.?.bind(0);
                 self.triangle_shader.?.setInt("uTexture", 0);
-                self.triangle_shader.?.setMat4("uView", self.camera.?.getView());
-                self.triangle_shader.?.setMat4("uProjection", self.camera.?.getProjection());
+                self.triangle_shader.?.setMat4("uView", self.camera.?.getView().transpose());
+                self.triangle_shader.?.setMat4("uProjection", self.camera.?.getProjection().transpose());
                 self.vao.?.render(RenderMode.Triangles, 6);
 
                 self.window.update();
