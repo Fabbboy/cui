@@ -1,5 +1,5 @@
 const std = @import("std");
-const WindowEvent = @import("../Window/Event.zig").WindowEvent;
+const WindowEvent = @import("../App/Event.zig").WindowEvent;
 const KeyCode = @import("Keyboard.zig").KeyCode;
 
 const Self = @This();

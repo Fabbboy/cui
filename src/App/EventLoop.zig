@@ -4,9 +4,9 @@ const mem = std.mem;
 const glfw = @import("../c.zig").glfw;
 const EventApp = @import("../App/App.zig").EventApp;
 const WindowEvent = @import("Event.zig").WindowEvent;
-const Window = @import("Window.zig");
+const Window = @import("../Window/Window.zig");
 const WindowError = Window.WindowError;
-const WindowDesc = @import("Desc.zig");
+const WindowDesc = @import("../Window/Desc.zig");
 
 const Self = @This();
 

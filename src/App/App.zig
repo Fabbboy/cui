@@ -3,8 +3,8 @@ const mem = std.mem;
 
 const WindowDesc = @import("../Window/Desc.zig");
 const Window = @import("../Window/Window.zig");
-const EventLoop = @import("../Window/EventLoop.zig");
-const WindowEvent = @import("../Window/Event.zig").WindowEvent;
+const EventLoop = @import("EventLoop.zig");
+const WindowEvent = @import("Event.zig").WindowEvent;
 
 pub fn EventApp(T: type) type {
     return struct {

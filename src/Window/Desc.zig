@@ -1,6 +1,6 @@
 const Pair = @import("../ADT/Pair.zig").Pair;
-const EventLoop = @import("EventLoop.zig");
-const WindowEvents = @import("Event.zig").WindowEvent;
+const EventLoop = @import("../App/EventLoop.zig");
+const WindowEvents = @import("../App/Event.zig").WindowEvent;
 
 const WindowDesc = @This();
 

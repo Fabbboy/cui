@@ -4,8 +4,8 @@ const glfw = @import("../c.zig").glfw;
 const glad = @import("../c.zig").glad;
 const WindowDesc = @import("./Desc.zig");
 const Pair = @import("../ADT/Pair.zig").Pair;
-const EventLoop = @import("./EventLoop.zig");
-const WindowEvent = @import("./Event.zig").WindowEvent;
+const EventLoop = @import("../App/EventLoop.zig");
+const WindowEvent = @import("../App/Event.zig").WindowEvent;
 
 const KeyCode = @import("../Input/Keyboard.zig").KeyCode;
 

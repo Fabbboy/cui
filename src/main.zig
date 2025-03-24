@@ -3,8 +3,8 @@ const heap = std.heap;
 const mem = std.mem;
 
 const Pair = @import("ADT/Pair.zig").Pair;
-const EventLoop = @import("Window/EventLoop.zig");
-const WindowEvent = @import("Window/Event.zig").WindowEvent;
+const EventLoop = @import("App/EventLoop.zig");
+const WindowEvent = @import("App/Event.zig").WindowEvent;
 const Window = @import("Window/Window.zig");
 const WindowDesc = @import("Window/Desc.zig");
 const glad = @import("c.zig").glad;
