@@ -78,10 +78,10 @@ pub const GameApp = struct {
 
         const vertices = [_]f32{
             // positions        // tex coords
-            -0.5, 0.5, 0.0, 0.0, 1.0, // top left
-            0.5, 0.5, 0.0, 1.0, 1.0, // top right
-            0.5, -0.5, 0.0, 1.0, 0.0, // bottom right
-            -0.5, -0.5, 0.0, 0.0, 0.0, // bottom left
+            -100.0, 100.0, 0.0, 0.0, 1.0, // top left
+            100.0, 100.0, 0.0, 1.0, 1.0, // top right
+            100.0, -100.0, 0.0, 1.0, 0.0, // bottom right
+            -100.0, -100.0, 0.0, 0.0, 0.0, // bottom left
         };
 
         const indices = [_]u32{
