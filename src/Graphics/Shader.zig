@@ -5,6 +5,7 @@ const Source = @import("../ADT/Source.zig");
 const String = @import("../ADT/String.zig");
 
 const glad = @import("../c.zig").glad;
+const ziglm = @import("ziglm");
 
 pub const ShaderError = error{
     VertexShaderFailed,
@@ -113,4 +114,9 @@ pub fn setInt(self: *Self, name: []const u8, value: i32) void {
 pub fn setFloat(self: *Self, name: []const u8, value: f32) void {
     const location = glad.glGetUniformLocation(@as(c_uint, @intCast(self.shader_id)), @as([*c]const u8, @alignCast(@ptrCast(name))));
     glad.glUniform1f(location, value);
+}
+
+pub fn setVec2(self: *Self, name: []const u8, value: ziglm.Vec2(f32)) void {
+    const location = glad.glGetUniformLocation(@as(c_uint, @intCast(self.shader_id)), @as([*c]const u8, @alignCast(@ptrCast(name))));
+    glad.glUniform2f(location, value.x, value.y);
 }
