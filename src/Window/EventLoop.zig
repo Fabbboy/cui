@@ -31,7 +31,7 @@ pub fn window(self: *Self) WindowError!*Window {
         return w;
     }
 
-    const w = try Window.init(self._desc);
+    const w = try Window.init(self._desc, self);
     self._window = w;
     try self._window.?.makeCurrent();
     return &self._window.?;

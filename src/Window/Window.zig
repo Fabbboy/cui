@@ -17,6 +17,7 @@ const Self = @This();
 
 window: ?*glfw.GLFWwindow,
 desc: WindowDesc,
+event_loop: *EventLoop,
 
 fn handle_viewport(window: ?*glfw.GLFWwindow, width: c_int, height: c_int) callconv(.c) void {
     const self_ptr = glfw.glfwGetWindowUserPointer(window);
@@ -26,8 +27,9 @@ fn handle_viewport(window: ?*glfw.GLFWwindow, width: c_int, height: c_int) callc
 
     const self = @as(*Self, @alignCast(@ptrCast(self_ptr)));
 
-    self.desc.dims = Pair(u32, u32).init(@as(u32, @intCast(width)), @as(u32, @intCast(height)));
-    glad.glViewport(0, 0, width, height);
+    const dim = Pair(u32, u32){ .a = @as(u32, @intCast(width)), .b = @as(u32, @intCast(height)) };
+
+    self.event_loop.pushEvent(.{ .Resize = .{ .dims = dim } }) catch unreachable;
 }
 
 fn glfw_err_cb(err: c_int, description: [*c]const u8) callconv(.c) void {
@@ -35,7 +37,7 @@ fn glfw_err_cb(err: c_int, description: [*c]const u8) callconv(.c) void {
     std.debug.print("Description: {s}\n", .{description});
 }
 
-pub fn init(desc: WindowDesc) WindowError!Self {
+pub fn init(desc: WindowDesc, event_loop: *EventLoop) WindowError!Self {
     if (glfw.glfwInit() == 0) {
         return WindowError.GLFWInitFailed;
     }
@@ -60,6 +62,7 @@ pub fn init(desc: WindowDesc) WindowError!Self {
     return Self{
         .window = window,
         .desc = desc,
+        .event_loop = event_loop,
     };
 }
 
@@ -90,6 +93,19 @@ pub fn pollEvents(self: *Self, event_loop: *EventLoop) !void {
         try event_loop.pushEvent(WindowEvent.Close);
     }
     try event_loop.pushEvent(WindowEvent.Redraw);
+}
+
+pub fn getDims(self: *Self) Pair(u32, u32) {
+    return self.desc.dims;
+}
+
+pub fn resize(self: *Self, dims: Pair(u32, u32)) void {
+    const cCastedDimsA = @as(c_int, @intCast(dims.a));
+    const cCastedDimsB = @as(c_int, @intCast(dims.b));
+
+    glad.glViewport(0, 0, cCastedDimsA, cCastedDimsB);
+
+    self.desc.dims = dims;
 }
 
 pub inline fn shouldClose(self: *Self) bool {

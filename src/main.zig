@@ -28,6 +28,8 @@ const Attribute = @import("Graphics/Pipeline.zig").Attribute;
 
 const Texture = @import("Graphics/Texture.zig");
 
+const Camera = @import("Graphics/Camera.zig");
+
 const ziglm = @import("ziglm");
 
 pub const GameApp = struct {
@@ -38,6 +40,7 @@ pub const GameApp = struct {
     triangle_ebo: ?Buffer,
     vao: ?Pipeline,
     brick_wall: ?Texture,
+    camera: ?Camera,
 
     pub fn init(window: *Window, allocator: mem.Allocator) GameApp {
         return GameApp{
@@ -48,6 +51,7 @@ pub const GameApp = struct {
             .triangle_ebo = null,
             .vao = null,
             .brick_wall = null,
+            .camera = null,
         };
     }
 
@@ -93,12 +97,14 @@ pub const GameApp = struct {
         if (self.vao) |*v| {
             v.bind();
             try v.attach(Attribute.init(3, GLType.Float, false, &self.triangle_vbo.?));
-            try v.attach(Attribute.init(2, GLType.Float, false, null));
+            try v.attach(Attribute.init(2, GLType.Float, false, &self.triangle_vbo.?));
             v.attachEbo(self.triangle_ebo.?);
             v.finalize();
         }
 
         self.brick_wall = try Texture.init("assets/textures/brick_wall.png", c.ImgFormat.RGBA);
+
+        self.camera = Camera.init(self.window.getDims());
     }
 
     pub fn handle(self: *GameApp, event: WindowEvent, event_loop: *EventLoop) void {
@@ -110,9 +116,15 @@ pub const GameApp = struct {
                 self.triangle_shader.?.bind();
                 self.brick_wall.?.bind(0);
                 self.triangle_shader.?.setInt("uTexture", 0);
+                self.triangle_shader.?.setMat4("uView", self.camera.?.getView());
+                self.triangle_shader.?.setMat4("uProjection", self.camera.?.getProjection());
                 self.vao.?.render(RenderMode.Triangles, 6);
 
                 self.window.update();
+            },
+            WindowEvent.Resize => |dims| {
+                self.camera.?.resize(dims.dims);
+                self.window.resize(dims.dims);
             },
             WindowEvent.Close => {
                 event_loop.exit();
