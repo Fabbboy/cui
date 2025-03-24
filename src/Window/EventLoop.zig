@@ -57,6 +57,7 @@ pub fn run(self: *Self, comptime T: type, app: EventApp(T)) !void {
         }
 
         try self._window.?.pollEvents(self);
+        try self._events.append(WindowEvent.Action);
     }
 }
 

@@ -7,10 +7,10 @@ out vec2 TexCoord;
 
 uniform mat4 uProjection;
 uniform mat4 uView;
+uniform mat4 uModel;
 
 void main() {
-  mat4 model = mat4(1.0);
-
-  gl_Position = uProjection * uView * model * vec4(aPos, 1.0); // Intentionally wrongly written
+  gl_Position = uProjection * uView * uModel *
+                vec4(aPos, 1.0); // Intentionally wrongly written
   TexCoord = aTexCoord;
 }

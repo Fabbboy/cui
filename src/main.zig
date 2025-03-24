@@ -42,6 +42,8 @@ pub const GameApp = struct {
     vao: ?Pipeline,
     brick_wall: ?Texture,
     camera: ?Camera,
+    model: glm.Mat4,
+    key_states: [512]u8,
 
     pub fn init(window: *Window, allocator: mem.Allocator) GameApp {
         return GameApp{
@@ -53,6 +55,8 @@ pub const GameApp = struct {
             .vao = null,
             .brick_wall = null,
             .camera = null,
+            .model = glm.Mat4.identity(),
+            .key_states = undefined,
         };
     }
 
@@ -123,6 +127,7 @@ pub const GameApp = struct {
                 self.triangle_shader.?.setInt("uTexture", 0);
                 self.triangle_shader.?.setMat4("uView", self.camera.?.getView());
                 self.triangle_shader.?.setMat4("uProjection", self.camera.?.getProjection());
+                self.triangle_shader.?.setMat4("uModel", self.model);
                 self.vao.?.render(RenderMode.Triangles, 6);
 
                 self.window.update();
@@ -138,8 +143,29 @@ pub const GameApp = struct {
                 if (key == KeyCode.Escape) {
                     event_loop.exit();
                 }
+
+                self.key_states[@as(usize, @intCast(@intFromEnum(key)))] = 1;
             },
-            else => {},
+            WindowEvent.Released => |key| {
+                self.key_states[@as(usize, @intCast(@intFromEnum(key)))] = 0;
+            },
+            WindowEvent.Action => {
+                if (self.key_states[@as(usize, @intCast(@intFromEnum(KeyCode.W)))] == 1) {
+                    self.model.translate(glm.vec3(0.0, 0.1, 0.0));
+                }
+
+                if (self.key_states[@as(usize, @intCast(@intFromEnum(KeyCode.S)))] == 1) {
+                    self.model.translate(glm.vec3(0.0, -0.1, 0.0));
+                }
+
+                if (self.key_states[@as(usize, @intCast(@intFromEnum(KeyCode.A)))] == 1) {
+                    self.model.translate(glm.vec3(-0.1, 0.0, 0.0));
+                }
+
+                if (self.key_states[@as(usize, @intCast(@intFromEnum(KeyCode.D)))] == 1) {
+                    self.model.translate(glm.vec3(0.1, 0.0, 0.0));
+                }
+            },
         }
     }
 
