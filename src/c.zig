@@ -6,6 +6,10 @@ pub const glad = @cImport({
     @cInclude("glad.h");
 });
 
+pub const stbi = @cImport({
+    @cInclude("stb_image.h");
+});
+
 pub const GLType = enum(u32) {
     Float = glad.GL_FLOAT,
     Int = glad.GL_INT,
@@ -14,6 +18,18 @@ pub const GLType = enum(u32) {
         switch (self) {
             .Float => return glad.GL_FLOAT,
             .Int => return glad.GL_INT,
+        }
+    }
+};
+
+pub const ImgFormat = enum(u32) {
+    RGB = stbi.STBI_rgb,
+    RGBA = stbi.STBI_rgb_alpha,
+
+    pub fn toStbi(self: ImgFormat) c_int {
+        switch (self) {
+            .RGB => return stbi.STBI_rgb,
+            .RGBA => return stbi.STBI_rgb_alpha,
         }
     }
 };

@@ -18,11 +18,16 @@ pub fn build(b: *std.Build) void {
 
     exe.addIncludePath(b.path("vendor"));
 
-    const CSource = std.Build.Module.CSourceFile{
+    const CSourceGlad = std.Build.Module.CSourceFile{
         .file = b.path("vendor/glad.c"),
     };
 
-    exe.addCSourceFile(CSource);
+    const CSourceStbi = std.Build.Module.CSourceFile{
+        .file = b.path("vendor/stb_image.c"),
+    };
+
+    exe.addCSourceFile(CSourceGlad);
+    exe.addCSourceFile(CSourceStbi);
     exe.linkLibC();
     exe.linkSystemLibrary("glfw3");
 

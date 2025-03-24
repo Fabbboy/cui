@@ -24,6 +24,8 @@ const BufferUsage = BufferNs.BufferUsage;
 const Pipeline = @import("Graphics/Pipeline.zig").Pipeline;
 const Attribute = @import("Graphics/Pipeline.zig").Attribute;
 
+const Texture = @import("Graphics/Texture.zig");
+
 pub const GameApp = struct {
     window: *Window,
     allocator: mem.Allocator,
@@ -31,6 +33,7 @@ pub const GameApp = struct {
     triangle_vbo: ?Buffer,
     triangle_ebo: ?Buffer,
     vao: ?Pipeline,
+    brick_wall: ?Texture,
 
     pub fn init(window: *Window, allocator: mem.Allocator) GameApp {
         return GameApp{
@@ -40,6 +43,7 @@ pub const GameApp = struct {
             .triangle_vbo = null,
             .triangle_ebo = null,
             .vao = null,
+            .brick_wall = null,
         };
     }
 
@@ -50,6 +54,10 @@ pub const GameApp = struct {
 
         if (self.vao) |*vao| {
             vao.deinit();
+        }
+
+        if (self.brick_wall) |*tex| {
+            tex.deinit();
         }
     }
 
@@ -62,9 +70,9 @@ pub const GameApp = struct {
         self.triangle_shader = try Shader.init(&vertex_source, &frag_source, self.allocator);
 
         const vertices = [_]f32{
-            0.0, 0.5, 0.0, // top center
-            -0.5, -0.5, 0.0, // bottom left
-            0.5, -0.5, 0.0, // bottom right
+            0.5, -0.5, 0.0, 1.0, 0.0, // bottom right
+            -0.5, -0.5, 0.0, 0.0, 0.0, // bottom left
+            0.0, 0.5, 0.0, 0.5, 1.0, // top
         };
 
         const indices = [_]u32{ 0, 1, 2 };
@@ -76,9 +84,12 @@ pub const GameApp = struct {
         if (self.vao) |*v| {
             v.bind();
             try v.attach(Attribute.init(3, GLType.Float, false, &self.triangle_vbo.?));
+            try v.attach(Attribute.init(2, GLType.Float, false, &self.triangle_vbo.?));
             v.attachEbo(self.triangle_ebo.?);
             v.finalize();
         }
+
+        self.brick_wall = try Texture.init("assets/textures/brick_wall.png", c.ImgFormat.RGBA);
     }
 
     pub fn handle(self: *GameApp, event: WindowEvent, event_loop: *EventLoop) void {
