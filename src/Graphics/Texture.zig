@@ -20,6 +20,7 @@ pub fn init(path: []const u8, format: ImgFormat) TextureError!Self {
     var height: c_int = 0;
     var channels: c_int = 0;
     const stbi_format = format.toStbi();
+    stbi.stbi_set_flip_vertically_on_load(@as(c_int, @intFromBool(true)));
     const data = stbi.stbi_load(@as([*c]const u8, @alignCast(@ptrCast(path))), &width, &height, &channels, stbi_format);
 
     if (data == null) {
