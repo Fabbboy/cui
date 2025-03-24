@@ -2,9 +2,8 @@ const std = @import("std");
 const mem = std.mem;
 
 const glfw = @import("../c.zig").glfw;
-
+const EventApp = @import("../App/App.zig").EventApp;
 const WindowEvent = @import("Event.zig").WindowEvent;
-const EventApp = @import("App.zig").EventApp;
 const Window = @import("Window.zig");
 const WindowError = Window.WindowError;
 const WindowDesc = @import("Desc.zig");
@@ -55,6 +54,8 @@ pub fn run(self: *Self, comptime T: type, app: EventApp(T)) !void {
         while (self._events.pop()) |e| {
             app.vtable.handle(app.self, e, self);
         }
+
+        self._events.clearRetainingCapacity();
 
         try self._window.?.pollEvents(self);
         try self._events.append(WindowEvent.Action);
