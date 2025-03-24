@@ -28,6 +28,8 @@ const Attribute = @import("Graphics/Pipeline.zig").Attribute;
 
 const Texture = @import("Graphics/Texture.zig");
 
+const KeyCode = @import("Input/Keyboard.zig").KeyCode;
+
 const Camera = @import("Graphics/Camera.zig");
 const glm = @import("glm.zig");
 
@@ -132,6 +134,12 @@ pub const GameApp = struct {
             WindowEvent.Close => {
                 event_loop.exit();
             },
+            WindowEvent.Pressed => |key| {
+                if (key == KeyCode.Escape) {
+                    event_loop.exit();
+                }
+            },
+            else => {},
         }
     }
 

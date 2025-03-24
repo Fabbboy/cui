@@ -7,6 +7,8 @@ const Pair = @import("../ADT/Pair.zig").Pair;
 const EventLoop = @import("./EventLoop.zig");
 const WindowEvent = @import("./Event.zig").WindowEvent;
 
+const KeyCode = @import("../Input/Keyboard.zig").KeyCode;
+
 pub const WindowError = error{
     GLFWInitFailed,
     GLFWWindowCreationFailed,
@@ -30,6 +32,28 @@ fn handle_viewport(window: ?*glfw.GLFWwindow, width: c_int, height: c_int) callc
     const dim = Pair(u32, u32){ .a = @as(u32, @intCast(width)), .b = @as(u32, @intCast(height)) };
 
     self.event_loop.pushEvent(.{ .Resize = .{ .dims = dim } }) catch unreachable;
+}
+
+fn handle_key(window: ?*glfw.GLFWwindow, key: c_int, scancode: c_int, action: c_int, mods: c_int) callconv(.c) void {
+    _ = scancode;
+    _ = mods;
+
+    const self_ptr = glfw.glfwGetWindowUserPointer(window);
+    if (self_ptr == null) {
+        return;
+    }
+    const self = @as(*Self, @alignCast(@ptrCast(self_ptr)));
+    const keycode = @as(KeyCode, @enumFromInt(key));
+
+    switch (action) {
+        glfw.GLFW_PRESS => {
+            _ = self.event_loop.pushEvent(.{ .Pressed = keycode }) catch unreachable;
+        },
+        glfw.GLFW_RELEASE => {
+            _ = self.event_loop.pushEvent(.{ .Released = keycode }) catch unreachable;
+        },
+        else => {},
+    }
 }
 
 fn glfw_err_cb(err: c_int, description: [*c]const u8) callconv(.c) void {
@@ -75,6 +99,7 @@ pub fn makeCurrent(self: *Self) WindowError!void {
     glfw.glfwSetWindowUserPointer(self.window, self);
 
     _ = glfw.glfwSetFramebufferSizeCallback(self.window, handle_viewport);
+    _ = glfw.glfwSetKeyCallback(self.window, handle_key);
 }
 
 pub fn deinit(self: *Self) void {
