@@ -37,28 +37,6 @@ const Input = @import("Input/Input.zig");
 const Camera = @import("Graphics/Camera.zig");
 const glm = @import("glm.zig");
 
-pub const GameApp = struct {
-    pub fn deinit(self: *GameApp) void {
-        _ = self;
-    }
-
-    pub fn handle(self: *GameApp, event: WindowEvent, event_loop: *EventLoop) void {
-        _ = event_loop;
-        _ = event;
-        _ = self;
-    }
-
-    pub fn app(self: *GameApp) EventApp(GameApp) {
-        return EventApp(GameApp){
-            .self = self,
-            .vtable = .{
-                .handle = &GameApp.handle,
-                .deinit = &GameApp.deinit,
-            },
-        };
-    }
-};
-
 pub fn main() !void {
     var gpa = heap.GeneralPurposeAllocator(.{
         .verbose_log = false,
@@ -77,9 +55,7 @@ pub fn main() !void {
         .setDims(Pair(u32, u32).init(800, 600))
         .setGLV(Pair(u4, u4).init(4, 6));
 
-    var gameApp = GameApp{};
-
-    var app = try App(GameApp).init(desc, gameApp.app(), gpa.allocator());
+    var app = App.init(gpa.allocator());
     defer app.deinit();
 
     try app.run();

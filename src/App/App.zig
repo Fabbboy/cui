@@ -20,36 +20,46 @@ pub fn EventApp(T: type) type {
     };
 }
 
-pub fn App(comptime T: type) type {
-    return struct {
-        const Self = @This();
-        event_loop: EventLoop,
-        window: *Window,
-        allocator: mem.Allocator,
-        handler: EventApp(T),
-        registry: ecs.Registry,
+pub const Plugin = struct {
+    self: *anyopaque,
+    vtable: VTable,
+    //all systems
 
-        pub fn init(desc: WindowDesc, handler: EventApp(T), allocator: mem.Allocator) !Self {
-            var event_loop = EventLoop.init(desc, allocator);
-            const window = try event_loop.window();
-
-            return Self{
-                .event_loop = event_loop,
-                .window = window,
-                .allocator = allocator,
-                .handler = handler,
-                .registry = ecs.Registry.init(allocator),
-            };
-        }
-
-        pub fn deinit(self: *Self) void {
-            self.handler.vtable.deinit(self.handler.self);
-            self.event_loop.deinit();
-            self.registry.deinit();
-        }
-
-        pub fn run(self: *Self) !void {
-            try self.event_loop.run(T, self.handler);
-        }
+    pub const VTable = struct {
+        build: *const fn (*anyopaque, *App) anyerror!void,
     };
-}
+
+    pub fn run(self: *Plugin, app: *App) anyerror!void {
+        _ = app;
+        _ = self;
+    }
+};
+
+pub const App = struct {
+    const Self = @This();
+    allocator: mem.Allocator,
+    registry: ecs.Registry,
+    plugins: std.ArrayList(Plugin),
+
+    pub fn init(allocator: mem.Allocator) Self {
+        return Self{
+            .allocator = allocator,
+            .registry = ecs.Registry.init(allocator),
+            .plugins = std.ArrayList(Plugin).init(allocator),
+        };
+    }
+
+    pub fn deinit(self: *Self) void {
+        self.registry.deinit();
+    }
+
+    pub fn run(self: *Self) anyerror!void {
+        for (self.plugins.items) |*plugin| {
+            try plugin.vtable.build(plugin.self, self);
+        }
+
+        for (self.plugins.items) |*plugin| {
+            try plugin.run(self);
+        }
+    }
+};
