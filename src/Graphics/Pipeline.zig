@@ -4,6 +4,7 @@ const mem = std.mem;
 const c = @import("../c.zig");
 const glad = c.glad;
 const GLType = c.GLType;
+const RenderMode = c.RenderMode;
 const Buffer = @import("Buffer.zig").Buffer;
 
 pub const PipelineError = error{
@@ -84,7 +85,7 @@ pub const Pipeline = struct {
     fn calcStride(self: *Self) void {
         self.stride = 0;
         for (self.attributes.items) |*attribute| {
-            self.stride += attribute.size * @sizeOf(f32);   
+            self.stride += attribute.size * @sizeOf(f32);
         }
     }
 
@@ -126,6 +127,17 @@ pub const Pipeline = struct {
 
         if (self.id != 0) {
             glad.glDeleteVertexArrays(1, &self.id);
+        }
+    }
+
+    pub fn render(self: *const Self, mode: RenderMode, count: usize) void {
+        self.bind();
+
+        if (self.ebo) |ebo| {
+            ebo.bind();
+            glad.glDrawElements(mode.toOpengl(), @as(c_int, @intCast(count)), glad.GL_UNSIGNED_INT, null);
+        } else {
+            glad.glDrawArrays(mode.toOpengl(), 0, @as(c_int, @intCast(count)));
         }
     }
 };

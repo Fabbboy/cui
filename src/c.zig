@@ -40,3 +40,17 @@ pub const ImgFormat = enum(u32) {
         }
     }
 };
+
+pub const RenderMode = enum(u32) {
+    Triangles = glad.GL_TRIANGLES,
+    Lines = glad.GL_LINES,
+    Points = glad.GL_POINTS,
+
+    pub fn toOpengl(self: RenderMode) c_uint {
+        switch (self) {
+            .Triangles => return glad.GL_TRIANGLES,
+            .Lines => return glad.GL_LINES,
+            .Points => return glad.GL_POINTS,
+        }
+    }
+};
