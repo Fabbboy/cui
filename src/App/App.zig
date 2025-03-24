@@ -1,6 +1,8 @@
 const std = @import("std");
 const mem = std.mem;
 
+const ecs = @import("ecs");
+
 const WindowDesc = @import("../Window/Desc.zig");
 const Window = @import("../Window/Window.zig");
 const EventLoop = @import("EventLoop.zig");
@@ -25,6 +27,7 @@ pub fn App(comptime T: type) type {
         window: *Window,
         allocator: mem.Allocator,
         handler: EventApp(T),
+        registry: ecs.Registry,
 
         pub fn init(desc: WindowDesc, handler: EventApp(T), allocator: mem.Allocator) !Self {
             var event_loop = EventLoop.init(desc, allocator);
@@ -35,12 +38,14 @@ pub fn App(comptime T: type) type {
                 .window = window,
                 .allocator = allocator,
                 .handler = handler,
+                .registry = ecs.Registry.init(allocator),
             };
         }
 
         pub fn deinit(self: *Self) void {
             self.handler.vtable.deinit(self.handler.self);
             self.event_loop.deinit();
+            self.registry.deinit();
         }
 
         pub fn run(self: *Self) !void {
