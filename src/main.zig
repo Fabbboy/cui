@@ -70,9 +70,10 @@ pub const GameApp = struct {
         self.triangle_shader = try Shader.init(&vertex_source, &frag_source, self.allocator);
 
         const vertices = [_]f32{
-            0.5, -0.5, 0.0, 1.0, 0.0, // bottom right
-            -0.5, -0.5, 0.0, 0.0, 0.0, // bottom left
+            // positions       // tex coords
             0.0, 0.5, 0.0, 0.5, 1.0, // top
+            -0.5, -0.5, 0.0, 0.0, 0.0, // bottom left
+            0.5, -0.5, 0.0, 1.0, 0.0, // bottom right
         };
 
         const indices = [_]u32{ 0, 1, 2 };
@@ -98,8 +99,36 @@ pub const GameApp = struct {
                 self.window.clear();
 
                 self.vao.?.bind();
+                var glError = glad.glGetError();
+                if (glError != glad.GL_NO_ERROR) {
+                    std.debug.print("OpenGL error: {d}\n", .{glError});
+                }
                 self.triangle_shader.?.bind();
+
+                glError = glad.glGetError();
+                if (glError != glad.GL_NO_ERROR) {
+                    std.debug.print("OpenGL error: {d}\n", .{glError});
+                }
+                glad.glActiveTexture(glad.GL_TEXTURE0);
+                glError = glad.glGetError();
+                if (glError != glad.GL_NO_ERROR) {
+                    std.debug.print("OpenGL error: {d}\n", .{glError});
+                }
+                glad.glBindTexture(glad.GL_TEXTURE_2D, self.brick_wall.?.tex_id);
+                glError = glad.glGetError();
+                if (glError != glad.GL_NO_ERROR) {
+                    std.debug.print("OpenGL error: {d}\n", .{glError});
+                }
+                self.triangle_shader.?.setInt("uTexture", 0);
+                glError = glad.glGetError();
+                if (glError != glad.GL_NO_ERROR) {
+                    std.debug.print("OpenGL error: {d}\n", .{glError});
+                }
                 glad.glDrawElements(glad.GL_TRIANGLES, 3, glad.GL_UNSIGNED_INT, null);
+                glError = glad.glGetError();
+                if (glError != glad.GL_NO_ERROR) {
+                    std.debug.print("OpenGL error: {d}\n", .{glError});
+                }
                 self.window.update();
             },
             WindowEvent.Close => {

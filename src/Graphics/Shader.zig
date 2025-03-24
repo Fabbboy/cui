@@ -104,3 +104,13 @@ fn compile_shader(self: *Self, source: *const Source, shader_type: u32) ShaderEr
 
     return shader_id;
 }
+
+pub fn setInt(self: *Self, name: []const u8, value: i32) void {
+    const location = glad.glGetUniformLocation(@as(c_uint, @intCast(self.shader_id)), @as([*c]const u8, @alignCast(@ptrCast(name))));
+    glad.glUniform1i(location, value);
+}
+
+pub fn setFloat(self: *Self, name: []const u8, value: f32) void {
+    const location = glad.glGetUniformLocation(@as(c_uint, @intCast(self.shader_id)), @as([*c]const u8, @alignCast(@ptrCast(name))));
+    glad.glUniform1f(location, value);
+}

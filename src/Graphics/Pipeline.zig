@@ -56,7 +56,6 @@ pub const Pipeline = struct {
     id: u32,
     attributes: std.ArrayList(Attribute),
     ebo: ?Buffer,
-    offset: usize,
     stride: usize,
 
     pub fn init(allocator: mem.Allocator) !Self {
@@ -70,7 +69,6 @@ pub const Pipeline = struct {
             .id = vao,
             .attributes = std.ArrayList(Attribute).init(allocator),
             .ebo = null,
-            .offset = 0,
             .stride = 0,
         };
     }
@@ -93,16 +91,22 @@ pub const Pipeline = struct {
     pub fn finalize(self: *Self) void {
         self.bind();
         self.calcStride();
+
         if (self.ebo) |ebo| {
             ebo.bind();
         }
 
+        var offset: usize = 0;
         for (self.attributes.items, 0..) |*attribute, index| {
-            attribute.enable(@as(u32, @intCast(index)), self.stride, self.offset);
-            self.offset += attribute.size * @sizeOf(f32);
+            attribute.enable(
+                @as(u32, @intCast(index)),
+                self.stride,
+                offset,
+            );
+            offset += attribute.size * @sizeOf(f32);
         }
 
-       glad.glBindVertexArray(0);
+        glad.glBindVertexArray(0);
     }
 
     pub fn bind(self: *const Self) void {

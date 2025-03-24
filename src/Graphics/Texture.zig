@@ -19,7 +19,9 @@ pub fn init(path: []const u8, format: ImgFormat) TextureError!Self {
     var width: c_int = 0;
     var height: c_int = 0;
     var channels: c_int = 0;
-    const data = stbi.stbi_load(@as([*c]const u8,@alignCast(@ptrCast(path))), &width, &height, &channels, format.toStbi());
+    const stbi_format = format.toStbi();
+    const data = stbi.stbi_load(@as([*c]const u8, @alignCast(@ptrCast(path))), &width, &height, &channels, stbi_format);
+
     if (data == null) {
         return TextureError.InvalidImage;
     }
@@ -31,7 +33,17 @@ pub fn init(path: []const u8, format: ImgFormat) TextureError!Self {
     glad.glTexParameteri(glad.GL_TEXTURE_2D, glad.GL_TEXTURE_WRAP_T, glad.GL_REPEAT);
     glad.glTexParameteri(glad.GL_TEXTURE_2D, glad.GL_TEXTURE_MIN_FILTER, glad.GL_LINEAR);
     glad.glTexParameteri(glad.GL_TEXTURE_2D, glad.GL_TEXTURE_MAG_FILTER, glad.GL_LINEAR);
-    glad.glTexImage2D(glad.GL_TEXTURE_2D, 0, glad.GL_RGB, width, height, 0, glad.GL_RGB, glad.GL_UNSIGNED_BYTE, data);
+    glad.glTexImage2D(
+        glad.GL_TEXTURE_2D,
+        0,
+        @as(c_int, @intCast(format.toOpengl())),
+        width,
+        height,
+        0,
+        format.toOpengl(),
+        glad.GL_UNSIGNED_BYTE,
+        data,
+    );
     glad.glGenerateMipmap(glad.GL_TEXTURE_2D);
     stbi.stbi_image_free(data);
 

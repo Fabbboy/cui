@@ -32,4 +32,11 @@ pub const ImgFormat = enum(u32) {
             .RGBA => return stbi.STBI_rgb_alpha,
         }
     }
+
+    pub fn toOpengl(self: ImgFormat) c_uint {
+        switch (self) {
+            .RGB => return glad.GL_RGB,
+            .RGBA => return glad.GL_RGBA,
+        }
+    }
 };
