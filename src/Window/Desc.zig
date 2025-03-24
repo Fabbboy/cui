@@ -10,7 +10,7 @@ glV: Pair(u4, u4),
 
 pub fn init() WindowDesc {
     return WindowDesc{
-        .name = null,
+        .name = "ZUI",
         .dims = Pair(u32, u32){ .a = 640, .b = 480 },
         .glV = Pair(u4, u4){ .a = 4, .b = 6 },
     };

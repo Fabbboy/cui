@@ -8,18 +8,6 @@ const Window = @import("../Window/Window.zig");
 const EventLoop = @import("EventLoop.zig");
 const WindowEvent = @import("Event.zig").WindowEvent;
 
-pub fn EventApp(T: type) type {
-    return struct {
-        self: *T,
-        vtable: VTable,
-
-        pub const VTable = struct {
-            handle: *const fn (*T, WindowEvent, *EventLoop) void,
-            deinit: *const fn (*T) void,
-        };
-    };
-}
-
 pub const Plugin = struct {
     self: *anyopaque,
     vtable: VTable,
@@ -27,6 +15,7 @@ pub const Plugin = struct {
 
     pub const VTable = struct {
         build: *const fn (*anyopaque, *App) anyerror!void,
+        deinit: *const fn (*anyopaque) void,
     };
 
     pub fn run(self: *Plugin, app: *App) anyerror!void {
@@ -49,8 +38,25 @@ pub const App = struct {
         };
     }
 
+    pub fn createEntity(self: *Self) ecs.Entity {
+        return self.registry.create();
+    }
+
+    pub fn insertPlugin(self: *Self, plugin: Plugin) !void {
+        try self.plugins.append(plugin);
+    }
+
+    pub fn spawn(self: *Self, entity: ecs.Entity, val: anytype) void {
+        self.registry.add(entity, val);
+    }
+
     pub fn deinit(self: *Self) void {
         self.registry.deinit();
+
+        for (self.plugins.items) |*plugin| {
+            plugin.vtable.deinit(plugin.self);
+        }
+        self.plugins.deinit();
     }
 
     pub fn run(self: *Self) anyerror!void {

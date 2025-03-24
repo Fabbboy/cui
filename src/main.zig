@@ -37,6 +37,8 @@ const Input = @import("Input/Input.zig");
 const Camera = @import("Graphics/Camera.zig");
 const glm = @import("glm.zig");
 
+const DefaultPlugin = @import("App/Default.zig").DefaultPlugin;
+
 pub fn main() !void {
     var gpa = heap.GeneralPurposeAllocator(.{
         .verbose_log = false,
@@ -57,6 +59,9 @@ pub fn main() !void {
 
     var app = App.init(gpa.allocator());
     defer app.deinit();
+
+    var defaultPlugin = DefaultPlugin.init();
+    try app.insertPlugin(defaultPlugin.plugin());
 
     try app.run();
 
