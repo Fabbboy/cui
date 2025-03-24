@@ -89,7 +89,7 @@ pub const GameApp = struct {
         if (self.vao) |*v| {
             v.bind();
             try v.attach(Attribute.init(3, GLType.Float, false, &self.triangle_vbo.?));
-            try v.attach(Attribute.init(2, GLType.Float, false, &self.triangle_vbo.?));
+            try v.attach(Attribute.init(2, GLType.Float, false, null));
             v.attachEbo(self.triangle_ebo.?);
             v.finalize();
         }
