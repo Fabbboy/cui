@@ -6,6 +6,7 @@ const String = @import("../ADT/String.zig");
 
 const glad = @import("../c.zig").glad;
 const ziglm = @import("ziglm");
+const glm = @import("../glm.zig");
 
 pub const ShaderError = error{
     VertexShaderFailed,
@@ -116,32 +117,47 @@ pub fn setFloat(self: *Self, name: []const u8, value: f32) void {
     glad.glUniform1f(location, value);
 }
 
-pub fn setVec2(self: *Self, name: []const u8, value: ziglm.Vec2(f32)) void {
+pub fn setVec2(self: *Self, name: []const u8, value: glm.Vec2) void {
     const location = glad.glGetUniformLocation(@as(c_uint, @intCast(self.shader_id)), @as([*c]const u8, @alignCast(@ptrCast(name))));
-    glad.glUniform2f(location, value.x, value.y);
+    glad.glUniform2f(location, value.vals[0], value.vals[1]);
 }
 
-pub fn setVec3(self: *Self, name: []const u8, value: ziglm.Vec3(f32)) void {
+pub fn setVec3(self: *Self, name: []const u8, value: glm.Vec3) void {
     const location = glad.glGetUniformLocation(@as(c_uint, @intCast(self.shader_id)), @as([*c]const u8, @alignCast(@ptrCast(name))));
-    glad.glUniform3f(location, value.x, value.y, value.z);
+    glad.glUniform3f(location, value.vals[0], value.vals[1], value.vals[2]);
 }
 
-pub fn setVec4(self: *Self, name: []const u8, value: ziglm.Vec4(f32)) void {
+pub fn setVec4(self: *Self, name: []const u8, value: glm.Vec4) void {
     const location = glad.glGetUniformLocation(@as(c_uint, @intCast(self.shader_id)), @as([*c]const u8, @alignCast(@ptrCast(name))));
-    glad.glUniform4f(location, value.x, value.y, value.z, value.w);
+    glad.glUniform4f(location, value.vals[0], value.vals[1], value.vals[2], value.vals[3]);
 }
 
-pub fn setMat2(self: *Self, name: []const u8, value: ziglm.Mat2(f32)) void {
+pub fn setMat2(self: *Self, name: []const u8, value: glm.Mat2) void {
     const location = glad.glGetUniformLocation(@as(c_uint, @intCast(self.shader_id)), @as([*c]const u8, @alignCast(@ptrCast(name))));
-    glad.glUniformMatrix2fv(location, 1, @as(u8, @intFromBool(false)), @as([*c]const f32, @alignCast(@ptrCast(&value))));
+    glad.glUniformMatrix2fv(
+        location,
+        1,
+        @as(u8, @intFromBool(false)),
+        @as([*c]const f32, @alignCast(@ptrCast(&value))),
+    );
 }
 
-pub fn setMat3(self: *Self, name: []const u8, value: ziglm.Mat3(f32)) void {
+pub fn setMat3(self: *Self, name: []const u8, value: glm.Mat3) void {
     const location = glad.glGetUniformLocation(@as(c_uint, @intCast(self.shader_id)), @as([*c]const u8, @alignCast(@ptrCast(name))));
-    glad.glUniformMatrix3fv(location, 1, @as(u8, @intFromBool(false)), @as([*c]const f32, @alignCast(@ptrCast(&value))));
+    glad.glUniformMatrix3fv(
+        location,
+        1,
+        @as(u8, @intFromBool(false)),
+        @as([*c]const f32, @alignCast(@ptrCast(&value))),
+    );
 }
 
-pub fn setMat4(self: *Self, name: []const u8, value: ziglm.Mat4(f32)) void {
+pub fn setMat4(self: *Self, name: []const u8, value: glm.Mat4) void {
     const location = glad.glGetUniformLocation(@as(c_uint, @intCast(self.shader_id)), @as([*c]const u8, @alignCast(@ptrCast(name))));
-    glad.glUniformMatrix4fv(location, 1, @as(u8, @intFromBool(false)), @as([*c]const f32, @ptrCast(&value)));
+    glad.glUniformMatrix4fv(
+        location,
+        1,
+        @as(u8, @intFromBool(false)),
+        @as([*c]const f32, @ptrCast(&value)),
+    );
 }

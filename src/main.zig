@@ -29,8 +29,7 @@ const Attribute = @import("Graphics/Pipeline.zig").Attribute;
 const Texture = @import("Graphics/Texture.zig");
 
 const Camera = @import("Graphics/Camera.zig");
-
-const ziglm = @import("ziglm");
+const glm = @import("glm.zig");
 
 pub const GameApp = struct {
     window: *Window,
@@ -116,8 +115,8 @@ pub const GameApp = struct {
                 self.triangle_shader.?.bind();
                 self.brick_wall.?.bind(0);
                 self.triangle_shader.?.setInt("uTexture", 0);
-                self.triangle_shader.?.setMat4("uView", self.camera.?.getView().transpose());
-                self.triangle_shader.?.setMat4("uProjection", self.camera.?.getProjection().transpose());
+                self.triangle_shader.?.setMat4("uView", self.camera.?.getView());
+                self.triangle_shader.?.setMat4("uProjection", self.camera.?.getProjection());
                 self.vao.?.render(RenderMode.Triangles, 6);
 
                 self.window.update();
