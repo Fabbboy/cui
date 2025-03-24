@@ -6,7 +6,7 @@ pub fn build(b: *std.Build) void {
     const optimize = b.standardOptimizeOption(.{});
 
     const ziglm_mod = b.createModule(.{
-        .root_source_file = b.path("ziglm/src/ziglm.zig"),
+        .root_source_file = b.path("vendor/ziglm/src/ziglm.zig"),
         .target = target,
         .optimize = optimize,
     });
