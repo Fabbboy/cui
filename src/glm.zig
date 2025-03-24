@@ -196,11 +196,6 @@ fn Matrix(comptime d: usize) type {
             return Self{ .vals = vals };
         }
 
-        pub fn translate(self: *Self, v: Vec3) void {
-            const translated = translation(v);
-            self.* = self.matmul(translated);
-        }
-
         // while std.testing.expectEqual is broken
         pub fn expectEqual(self: Self, other: Self) void {
             comptime var i = 0;
@@ -225,6 +220,11 @@ pub fn translation(v: Vec3) Mat4 {
             .{ v.vals[0], v.vals[1], v.vals[2], 1.0 },
         },
     };
+}
+
+pub fn translate(m: Mat4, v: Vec3) Mat4 {
+    const translated = translation(v);
+    return m.matmul(translated);
 }
 
 /// Transformation matrix for rotation around the z axis by a radians

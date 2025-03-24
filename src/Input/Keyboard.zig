@@ -98,7 +98,13 @@ pub const KeyCode = enum(i32) {
     Backslash = glfw.GLFW_KEY_BACKSLASH,
     GraveAccent = glfw.GLFW_KEY_GRAVE_ACCENT,
 
+    LastEntry = glfw.GLFW_KEY_LAST,
+
     pub fn toOpengl(self: KeyCode) c_int {
         return @as(c_int, @intFromEnum(self));
+    }
+
+    pub fn toUsize(self: KeyCode) usize {
+        return @as(usize, @intCast(@intFromEnum(self)));
     }
 };

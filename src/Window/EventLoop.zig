@@ -52,6 +52,7 @@ pub fn pushEvent(self: *Self, event: WindowEvent) !void {
 pub fn run(self: *Self, comptime T: type, app: EventApp(T)) !void {
     self._running = true;
     while (self._running) {
+        try self._events.append(WindowEvent.PreFrame);
         while (self._events.pop()) |e| {
             app.vtable.handle(app.self, e, self);
         }

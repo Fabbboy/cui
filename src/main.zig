@@ -29,6 +29,7 @@ const Attribute = @import("Graphics/Pipeline.zig").Attribute;
 const Texture = @import("Graphics/Texture.zig");
 
 const KeyCode = @import("Input/Keyboard.zig").KeyCode;
+const Input = @import("Input/Input.zig");
 
 const Camera = @import("Graphics/Camera.zig");
 const glm = @import("glm.zig");
@@ -43,7 +44,7 @@ pub const GameApp = struct {
     brick_wall: ?Texture,
     camera: ?Camera,
     model: glm.Mat4,
-    key_states: [512]u8,
+    input: Input,
 
     pub fn init(window: *Window, allocator: mem.Allocator) GameApp {
         return GameApp{
@@ -56,7 +57,7 @@ pub const GameApp = struct {
             .brick_wall = null,
             .camera = null,
             .model = glm.Mat4.identity(),
-            .key_states = undefined,
+            .input = Input.init(),
         };
     }
 
@@ -139,32 +140,32 @@ pub const GameApp = struct {
             WindowEvent.Close => {
                 event_loop.exit();
             },
-            WindowEvent.Pressed => |key| {
-                if (key == KeyCode.Escape) {
+            WindowEvent.Pressed, WindowEvent.Released => {
+                self.input.insert(event);
+            },
+            WindowEvent.Action => {
+                if (self.input.justPressed(KeyCode.Escape)) {
                     event_loop.exit();
                 }
 
-                self.key_states[@as(usize, @intCast(@intFromEnum(key)))] = 1;
+                if (self.input.isPressed(KeyCode.W)) {
+                    self.model = glm.translate(self.model, glm.vec3(0.0, 0.1, 0.0));
+                }
+
+                if (self.input.isPressed(KeyCode.S)) {
+                    self.model = glm.translate(self.model, glm.vec3(0.0, -0.1, 0.0));
+                }
+
+                if (self.input.isPressed(KeyCode.A)) {
+                    self.model = glm.translate(self.model, glm.vec3(-0.1, 0.0, 0.0));
+                }
+
+                if (self.input.isPressed(KeyCode.D)) {
+                    self.model = glm.translate(self.model, glm.vec3(0.1, 0.0, 0.0));
+                }
             },
-            WindowEvent.Released => |key| {
-                self.key_states[@as(usize, @intCast(@intFromEnum(key)))] = 0;
-            },
-            WindowEvent.Action => {
-                if (self.key_states[@as(usize, @intCast(@intFromEnum(KeyCode.W)))] == 1) {
-                    self.model.translate(glm.vec3(0.0, 0.1, 0.0));
-                }
-
-                if (self.key_states[@as(usize, @intCast(@intFromEnum(KeyCode.S)))] == 1) {
-                    self.model.translate(glm.vec3(0.0, -0.1, 0.0));
-                }
-
-                if (self.key_states[@as(usize, @intCast(@intFromEnum(KeyCode.A)))] == 1) {
-                    self.model.translate(glm.vec3(-0.1, 0.0, 0.0));
-                }
-
-                if (self.key_states[@as(usize, @intCast(@intFromEnum(KeyCode.D)))] == 1) {
-                    self.model.translate(glm.vec3(0.1, 0.0, 0.0));
-                }
+            WindowEvent.PreFrame => {
+                self.input.update();
             },
         }
     }
