@@ -74,7 +74,11 @@ pub const GameApp = struct {
         var frag_source = try Source.init(self.allocator, "assets/shaders/triangle.frag");
         defer frag_source.deinit();
 
-        self.triangle_shader = try Shader.init(&vertex_source, &frag_source, self.allocator);
+        self.triangle_shader = Shader.init(&vertex_source, &frag_source, self.allocator);
+        self.triangle_shader.?.compile() catch |e| {
+            std.debug.print("Shader compilation failed: {s}\n", .{self.triangle_shader.?.err.?.as_str()});
+            return e;
+        };
 
         const vertices = [_]f32{
             // positions        // tex coords

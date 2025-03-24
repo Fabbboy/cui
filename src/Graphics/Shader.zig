@@ -19,20 +19,24 @@ const Self = @This();
 shader_id: usize,
 err: ?String,
 allocator: mem.Allocator,
+vert_src: *const Source,
+frag_src: *const Source,
 
-pub fn init(vertex: *const Source, frag: *const Source, allocator: mem.Allocator) ShaderError!Self {
-    var self = Self{
+pub fn init(vertex: *const Source, frag: *const Source, allocator: mem.Allocator) Self {
+    return Self{
         .shader_id = 0,
         .err = null,
         .allocator = allocator,
+        .frag_src = frag,
+        .vert_src = vertex,
     };
+}
 
-    const vertex_shader = try self.compile_shader(vertex, glad.GL_VERTEX_SHADER);
-    const frag_shader = try self.compile_shader(frag, glad.GL_FRAGMENT_SHADER);
+pub fn compile(self: *Self) ShaderError!void {
+    const vertex_shader = try self.compile_shader(self.vert_src, glad.GL_VERTEX_SHADER);
+    const frag_shader = try self.compile_shader(self.frag_src, glad.GL_FRAGMENT_SHADER);
 
     self.shader_id = try self.link_shader(vertex_shader, frag_shader);
-
-    return self;
 }
 
 pub fn deinit(self: *Self) void {
@@ -88,13 +92,12 @@ fn compile_shader(self: *Self, source: *const Source, shader_type: u32) ShaderEr
     var success: i32 = 0;
     glad.glGetShaderiv(shader_id, glad.GL_COMPILE_STATUS, &success);
     if (success == 0) {
-        var log_length: i32 = 0;
-        glad.glGetShaderiv(shader_id, glad.GL_INFO_LOG_LENGTH, &log_length);
+        var log_length: usize = 0;
+        glad.glGetShaderiv(shader_id, glad.GL_INFO_LOG_LENGTH, @as([*c]c_int, @ptrCast(&log_length)));
 
-        var log_str = try String.initCapacity(@as(usize, @intCast(log_length)), self.allocator);
-
-        glad.glGetShaderInfoLog(shader_id, log_length, null, @as([*c]u8, @alignCast(@ptrCast(&log_str))));
-
+        var buf: [1024]u8 = undefined;
+        glad.glGetShaderInfoLog(shader_id, 1024, null, buf[0..]);
+        const log_str = try String.init(buf[0..log_length], self.allocator);
         self.err = log_str;
 
         return switch (shader_type) {
